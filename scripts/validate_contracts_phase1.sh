@@ -1,81 +1,111 @@
 #!/bin/bash
-# Atlantis Contract Validation - Phase 1
-# Validates all guarded boundaries from contract-checklist.yaml
-
-set -e
+# Atlantis Contract Validation - Phase 1 (Robust Version)
 
 CHECKLIST="docs/contract-checklist.yaml"
 REPORT_DIR="out/reports"
 REPORT_FILE="$REPORT_DIR/phase1_validation.json"
+TIMESTAMP=$(date -Iseconds)
 
-# Create report directory
+# Always create report directory
 mkdir -p "$REPORT_DIR"
 
-# Initialize JSON array
-echo "[" > "$REPORT_FILE"
+# Function to write valid JSON (even on error)
+write_json() {
+    cat > "$REPORT_FILE" << 'JSONEOF'
+[
+JSONEOF
+}
+
+write_json
 
 # Check if checklist exists
 if [ ! -f "$CHECKLIST" ]; then
-    echo "  {" >> "$REPORT_FILE"
-    echo "    \"contract\": \"contract-checklist.yaml\"," >> "$REPORT_FILE"
-    echo "    \"path\": \"$CHECKLIST\"," >> "$REPORT_FILE"
-    echo "    \"status\": \"failed\"," >> "$REPORT_FILE"
-    echo "    \"error_msg\": \"Contract checklist not found\"," >> "$REPORT_FILE"
-    echo "    \"timestamp\": \"$(date -Iseconds)\"" >> "$REPORT_FILE"
-    echo "  }" >> "$REPORT_FILE"
-    echo "]" >> "$REPORT_FILE"
-    echo "ERROR: $CHECKLIST not found"
+    cat >> "$REPORT_FILE" << EOF
+  {
+    "contract": "contract-checklist",
+    "path": "$CHECKLIST",
+    "status": "failed",
+    "error_msg": "Contract checklist file not found",
+    "timestamp": "$TIMESTAMP"
+  }
+]
+EOF
+    echo "ERROR: $CHECKLIST not found - created error report"
     exit 1
 fi
 
-# Parse contracts from YAML and validate each
-first_entry=true
-failed_count=0
+# Check if python3 and yaml are available
+if ! python3 -c "import yaml" 2>/dev/null; then
+    cat >> "$REPORT_FILE" << EOF
+  {
+    "contract": "contract-checklist",
+    "path": "$CHECKLIST",
+    "status": "failed",
+    "error_msg": "Python3 or PyYAML not installed",
+    "timestamp": "$TIMESTAMP"
+  }
+]
+EOF
+    echo "ERROR: PyYAML not available - created error report"
+    exit 1
+fi
 
-# Extract contract names and paths using python
-contracts=$(python3 -c "
+# Initialize counters
+failed_count=0
+total_count=0
+
+# Extract and validate each contract using Python
+python3 << 'PYEOF' > /tmp/contracts.txt
 import yaml
-with open('$CHECKLIST', 'r') as f:
+import json
+
+with open('docs/contract-checklist.yaml', 'r') as f:
     data = yaml.safe_load(f)
-for c in data.get('contracts', []):
+
+contracts = data.get('contracts', [])
+for c in contracts:
     name = c.get('name', 'unknown')
     path = c.get('structure', {}).get('path', '')
     files = c.get('structure', {}).get('files', [])
-    print(f'{name}|{path}|{','.join(files)}')
-")
+    # Output as tab-separated
+    print(f"{name}\t{path}\t{','.join(files)}")
+PYEOF
 
-while IFS='|' read -r contract_name contract_path contract_files; do
+# Process each contract
+first_entry=true
+while IFS=$'\t' read -r contract_name contract_path contract_files; do
     [ -z "$contract_name" ] && continue
     
+    total_count=$((total_count + 1))
     status="passed"
     error_msg=""
     
-    # Check if directory exists
+    # Check directory
     if [ ! -d "$contract_path" ]; then
         status="failed"
         error_msg="Directory does not exist: $contract_path"
-        ((failed_count++))
+        failed_count=$((failed_count + 1))
     else
-        # Check required files
+        # Check files
         IFS=',' read -ra files_array <<< "$contract_files"
         for file in "${files_array[@]}"; do
             [ -z "$file" ] && continue
-            file_path="$contract_path$file"
+            file_path="${contract_path}${file}"
             if [ ! -f "$file_path" ]; then
                 status="failed"
                 error_msg="Missing file: $file_path"
-                ((failed_count++))
+                failed_count=$((failed_count + 1))
                 break
             elif [ ! -s "$file_path" ]; then
                 status="failed"
                 error_msg="File is empty: $file_path"
-                ((failed_count++))
+                failed_count=$((failed_count + 1))
                 break
             fi
         done
     fi
     
-    # Add comma for previous entry
+    # Add comma separator
     if [ "$first_entry" = true ]; then
         first_entry=false
     else
@@ -83,31 +113,36 @@ while IFS='|' read -r contract_name contract_path contract_files; do
     fi
     
     # Write JSON entry
-    echo "  {" >> "$REPORT_FILE"
-    echo "    \"contract\": \"$contract_name\"," >> "$REPORT_FILE"
-    echo "    \"path\": \"$contract_path\"," >> "$REPORT_FILE"
-    echo "    \"status\": \"$status\"," >> "$REPORT_FILE"
-    echo "    \"error_msg\": \"$error_msg\"," >> "$REPORT_FILE"
-    echo "    \"timestamp\": \"$(date -Iseconds)\"" >> "$REPORT_FILE"
-    echo "  }" >> "$REPORT_FILE"
-    
-done <<< "$contracts"
+    cat >> "$REPORT_FILE" << EOF
+  {
+    "contract": "$contract_name",
+    "path": "$contract_path",
+    "status": "$status",
+    "error_msg": "$error_msg",
+    "timestamp": "$TIMESTAMP"
+  }
+EOF
+
+done < /tmp/contracts.txt
 
 # Close JSON array
 echo "]" >> "$REPORT_FILE"
 
 # Summary
 echo "================================"
-echo "Validation Summary"
+echo "Atlantis Contract Validation - Phase 1"
 echo "================================"
-echo "Total contracts: $(echo "$contracts" | grep -c .)"
+echo "Total contracts checked: $total_count"
 echo "Failed: $failed_count"
+echo "Passed: $((total_count - failed_count))"
 echo "Report: $REPORT_FILE"
 echo "================================"
 
-# Exit with error if any failed
+# Cleanup
+rm -f /tmp/contracts.txt
+
 if [ $failed_count -gt 0 ]; then
-    echo "❌ Validation failed with $failed_count errors"
+    echo "❌ Validation completed with $failed_count failures (expected in Dry-Run)"
     exit 1
 else
     echo "✅ All contracts validated successfully"
