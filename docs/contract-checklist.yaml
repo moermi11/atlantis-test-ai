@@ -1,0 +1,117 @@
+contracts:
+  - name: shiba_compose_staging_path
+    structure:
+      path: "profiles/shiba/"
+      files: ["compose.yaml", "device-manifest.yaml", "profile-spec.yaml"]
+    required_fields:
+      - field: "version"
+        type: "string"
+      - field: "target_arch"
+        type: "string"
+      - field: "base_os"
+        type: "string"
+    fail_condition: "compose.yaml or device-manifest.yaml missing, or target_arch is not arm64"
+
+  - name: boot_artifact_staging_boundary
+    structure:
+      path: "out/boot-artifacts/"
+      files: ["kernel.img", "initramfs.img", "boot-manifest.yaml"]
+    required_fields:
+      - field: "kernel_hash"
+        type: "sha256"
+      - field: "initramfs_hash"
+        type: "sha256"
+      - field: "build_timestamp"
+        type: "datetime"
+    fail_condition: "Artifact directory empty, or hashes in boot-manifest.yaml do not match actual files"
+
+  - name: installer_preparation_boundary
+    structure:
+      path: "contracts/installer-prep/"
+      files: ["installer-config.yaml", "signatures.json", "safety-guards.sh"]
+    required_fields:
+      - field: "guard_status"
+        type: "enum: guarded|blocked|released"
+      - field: "signer_key_id"
+        type: "string"
+      - field: "last_audit_date"
+        type: "date"
+    fail_condition: "guard_status is not guarded, safety-guards.sh missing, or signatures.json empty"
+
+  - name: read_only_evidence_boundary
+    structure:
+      path: "evidence/"
+      files: ["build-log.json", "hash-chain.txt", "audit-report.yaml"]
+    required_fields:
+      - field: "immutable_flag"
+        type: "boolean"
+      - field: "root_hash"
+        type: "sha256"
+      - field: "recorded_at"
+        type: "datetime"
+    fail_condition: "Directory is writable by standard user, root_hash missing, or evidence files can be modified"
+
+  - name: decision_review_boundary
+    structure:
+      path: "reviews/"
+      files: ["phase-review.yaml", "approval-log.json", "rollback-plan.md"]
+    required_fields:
+      - field: "reviewer_id"
+        type: "string"
+      - field: "decision_status"
+        type: "enum: approved|rejected|pending"
+      - field: "review_date"
+        type: "date"
+    fail_condition: "decision_status missing/empty, or rollback-plan.md is absent or under 1 line"
+
+  - name: command_plan_boundary
+    structure:
+      path: "plans/command-plan/"
+      files: ["blocked-plan.yaml", "block-justification.md"]
+    required_fields:
+      - field: "plan_state"
+        type: "enum: blocked"
+      - field: "block_reason"
+        type: "string"
+      - field: "unblock_conditions"
+        type: "array"
+    fail_condition: "plan_state is not blocked, or block_reason is empty/whitespace only"
+
+  - name: readiness_boundary
+    structure:
+      path: "contracts/readiness/"
+      files: ["readiness-checklist.yaml", "gate-results.json"]
+    required_fields:
+      - field: "all_gates_passed"
+        type: "boolean"
+      - field: "open_defects"
+        type: "array"
+      - field: "checked_at"
+        type: "datetime"
+    fail_condition: "all_gates_passed is true while open_defects contains entries, or checklist.yaml is empty"
+
+  - name: operator_session_bundle_boundary
+    structure:
+      path: "bundles/operator/"
+      files: ["session-config.yaml", "env-vars.env", "session-bootstrap.sh"]
+    required_fields:
+      - field: "session_id"
+        type: "string"
+      - field: "isolation_mode"
+        type: "string"
+      - field: "created_at"
+        type: "datetime"
+    fail_condition: "session_id missing/duplicate, or session-bootstrap.sh contains unguarded destructive commands"
+
+  - name: execution_harness_boundary
+    structure:
+      path: "harness/"
+      files: ["runbook.yaml", "dry-run-suite.sh", "execution-log.txt"]
+    required_fields:
+      - field: "dry_run_outcome"
+        type: "enum: pending|passed|failed"
+      - field: "safety_lock_active"
+        type: "boolean"
+      - field: "executed_at"
+        type: "datetime"
+    fail_condition: "safety_lock_active is false, or dry-run-suite.sh exists but lacks executable guard wrapper"
