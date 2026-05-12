@@ -1,0 +1,158 @@
+﻿**********************
+nStart der Windows PowerShell-Aufzeichnung
+Startzeit: 20260422073321
+Benutzername: CHS-VILLACH\moertl.mijo
+RunAs-Benutzer: CHS-VILLACH\moertl.mijo
+Konfigurationsname: 
+Computer: N1-01 (Microsoft Windows NT 10.0.26100.0)
+Hostanwendung: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command [Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('docs/roadmap.md')
+Prozess-ID: 11308
+PSVersion: 5.1.26100.7920
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7920
+BuildVersion: 10.0.26100.7920
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+PS>[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('docs/roadmap.md')
+# Atlantis Roadmap
+
+## Planning Assumptions
+
+- execution is staged to reduce risk and preserve reviewability
+- no milestone implies hardware support unless evidence is recorded
+- Pixel 8 is the first device target, but each sprint should leave reusable artifacts for future devices
+
+## Sprint 0: Foundation
+
+Goal:
+
+- establish repository structure, core docs, ADRs, package skeletons, status tracking, and chosen bootstrap strategy
+
+Exit criteria:
+
+- repo skeleton exists
+- foundation spec exists
+- baseline ADRs exist
+- status matrices and testing policy exist
+- initial package skeletons exist
+
+Status:
+
+- `in progress`
+
+## Sprint 1: Boot and Build Path Definition
+
+Goal:
+
+- define and implement the first real Atlantis boot path without claiming working hardware
+
+Planned work:
+
+- bootstrap a minimal Debian rootfs with `mmdebstrap`
+- define Atlantis package feed integration for image composition
+- document QEMU ARM64, nested Phosh, and Pixel 8 testing roles
+- add concrete Sprint 1 smoke-path runbooks for QEMU ARM64 and nested Phosh
+- define Phosh integration boundaries as the initial shell strategy
+- document the Pixel 8 boot chain assumptions and first flashing model
+
+Exit criteria:
+
+- `mmdebstrap` rootfs path exists as scripts plus documentation
+- testing strategy is defined
+- Phosh integration is defined without pretending Atlantis UI is finished
+- Pixel 8 boot path is documented with unknowns, blockers, and risks
+- next step for the first boot attempt is clear
+
+Status:
+
+- `in progress`
+
+## Sprint 2: First Boot Attempt
+
+Goal:
+
+- execute the documented Pixel 8 bring-up path and capture the first truthful boot result
+
+Planned work:
+
+- build Atlantis packages into a local feed and rootfs artifact
+- produce the first `shiba` kernel/initramfs/boot artifact set
+- implement the safest possible host-side flashing flow
+- capture the first hardware boot evidence or precise failure point
+
+Exit criteria:
+
+- installable development artifact path exists
+- boot attempt process is executed on real hardware
+- boot status is truthfully recorded as `boots`, `broken`, or `unverified`
+
+Status:
+
+- `planned`
+
+## Sprint 3: First Visible Shell
+
+Goal:
+
+- reach a visible Atlantis-branded shell layer on a booted system
+
+Planned work:
+
+- choose initial shell component stack
+- package shell dependencies
+- add lock screen, launcher shell surface, and settings entry points as stubs
+- integrate basic branding tokens without redesigning the brand system
+
+Exit criteria:
+
+- visible shell session is reachable on supported build path
+- shell package build is automated
+- user-facing shell status is documented separately from hardware capability status
+
+Status:
+
+- `planned`
+
+## Sprint 4: Input, Network, and Settings Basics
+
+Goal:
+
+- establish basic usability primitives for interactive testing
+
+Planned work:
+
+- touch/input integration
+- Wi-Fi bring-up path if hardware allows
+- initial settings surfaces
+- on-screen keyboard integration path
+- basic logs and bug-report capture flow
+
+Exit criteria:
+
+- interactive test plan exists for input/network/settings basics
+- each capability is marked with explicit validation state
+
+Status:
+
+- `planned`
+
+## Beyond Sprint 4
+
+Future planning areas, intentionally not committed yet:
+
+- update and rollback flow
+- notifications and quick settings maturity beyond upstream Phosh
+- modem and telephony validation
+- camera and sensor strategy
+- second-device selection and portability review
+PS>$global:?
+True
+**********************
+Ende der Windows PowerShell-Aufzeichnung
+Endzeit: 20260422073321
+**********************

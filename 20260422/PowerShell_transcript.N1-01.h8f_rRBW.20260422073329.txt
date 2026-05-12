@@ -1,0 +1,114 @@
+﻿**********************
+nStart der Windows PowerShell-Aufzeichnung
+Startzeit: 20260422073329
+Benutzername: CHS-VILLACH\moertl.mijo
+RunAs-Benutzer: CHS-VILLACH\moertl.mijo
+Konfigurationsname: 
+Computer: N1-01 (Microsoft Windows NT 10.0.26100.0)
+Hostanwendung: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command [Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('build/mmdebstrap/build-rootfs.sh')
+Prozess-ID: 13576
+PSVersion: 5.1.26100.7920
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7920
+BuildVersion: 10.0.26100.7920
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+PS>[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('build/mmdebstrap/build-rootfs.sh')
+#!/bin/sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
+
+SUITE=${SUITE:-bookworm}
+ARCH=${ARCH:-arm64}
+MMDEBSTRAP_MODE=${MMDEBSTRAP_MODE:-auto}
+MMDEBSTRAP_VARIANT=${MMDEBSTRAP_VARIANT:-minbase}
+MIRROR=${MIRROR:-https://deb.debian.org/debian}
+SECURITY_MIRROR=${SECURITY_MIRROR:-http://security.debian.org/debian-security}
+ROOTFS_DIR=${ROOTFS_DIR:-"$REPO_ROOT/out/rootfs/$SUITE-$ARCH"}
+REPO_DIR=${REPO_DIR:-"$REPO_ROOT/out/repo"}
+ATLANTIS_PACKAGES=${ATLANTIS_PACKAGES:-atlantis-base,atlantis-branding,atlantis-shell}
+ATLANTIS_EXTRA_PACKAGES=${ATLANTIS_EXTRA_PACKAGES:-}
+
+join_package_file() {
+    awk '
+        /^[[:space:]]*#/ { next }
+        /^[[:space:]]*$/ { next }
+        {
+            if (length(out) > 0) {
+                out = out "," $0
+            } else {
+                out = $0
+            }
+        }
+        END { print out }
+    ' "$1"
+}
+
+append_csv() {
+    left=$1
+    right=$2
+
+    if [ -z "$left" ]; then
+        printf '%s' "$right"
+    elif [ -z "$right" ]; then
+        printf '%s' "$left"
+    else
+        printf '%s,%s' "$left" "$right"
+    fi
+}
+
+if ! command -v mmdebstrap >/dev/null 2>&1; then
+    echo "mmdebstrap is required." >&2
+    exit 1
+fi
+
+INCLUDE_PACKAGES=$(join_package_file "$SCRIPT_DIR/packages/base.list")
+INCLUDE_PACKAGES=$(append_csv "$INCLUDE_PACKAGES" "$(join_package_file "$SCRIPT_DIR/packages/phosh.list")")
+INCLUDE_PACKAGES=$(append_csv "$INCLUDE_PACKAGES" "$ATLANTIS_PACKAGES")
+INCLUDE_PACKAGES=$(append_csv "$INCLUDE_PACKAGES" "$ATLANTIS_EXTRA_PACKAGES")
+
+SOURCES_FILE="$TMP_DIR/sources.list"
+{
+    printf 'deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] %s %s main\n' "$MIRROR" "$SUITE"
+    printf 'deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] %s %s-updates main\n' "$MIRROR" "$SUITE"
+    printf 'deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] %s %s-security main\n' "$SECURITY_MIRROR" "$SUITE"
+} > "$SOURCES_FILE"
+
+if [ -d "$REPO_DIR" ] && find "$REPO_DIR" -maxdepth 1 -name '*.deb' -print -quit | grep . >/dev/null 2>&1; then
+    ln -s "$REPO_DIR" "$TMP_DIR/repo"
+    printf 'deb [trusted=yes] file:%s ./\n' "$TMP_DIR/repo" >> "$SOURCES_FILE"
+fi
+
+rm -rf "$ROOTFS_DIR"
+mkdir -p "$ROOTFS_DIR"
+
+mmdebstrap \
+    --mode="$MMDEBSTRAP_MODE" \
+    --variant="$MMDEBSTRAP_VARIANT" \
+    --architectures="$ARCH" \
+    --components=main \
+    --format=directory \
+    --include="$INCLUDE_PACKAGES" \
+    --aptopt='Apt::Install-Recommends "false"' \
+    --aptopt='Acquire::Languages "none"' \
+    --customize-hook="$SCRIPT_DIR/hooks/10-cleanup-apt.sh \$1" \
+    "$SUITE" \
+    "$ROOTFS_DIR" \
+    "$SOURCES_FILE"
+
+echo "Atlantis rootfs created at $ROOTFS_DIR"
+PS>$global:?
+True
+**********************
+Ende der Windows PowerShell-Aufzeichnung
+Endzeit: 20260422073329
+**********************

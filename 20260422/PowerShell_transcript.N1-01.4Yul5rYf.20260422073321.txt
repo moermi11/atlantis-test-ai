@@ -1,0 +1,69 @@
+﻿**********************
+nStart der Windows PowerShell-Aufzeichnung
+Startzeit: 20260422073321
+Benutzername: CHS-VILLACH\moertl.mijo
+RunAs-Benutzer: CHS-VILLACH\moertl.mijo
+Konfigurationsname: 
+Computer: N1-01 (Microsoft Windows NT 10.0.26100.0)
+Hostanwendung: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command [Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('docs/status/feature-matrix.md')
+Prozess-ID: 12116
+PSVersion: 5.1.26100.7920
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7920
+BuildVersion: 10.0.26100.7920
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+PS>[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('docs/status/feature-matrix.md')
+# Atlantis Feature Matrix
+
+## State Vocabulary
+
+- `planned`
+- `in progress`
+- `builds`
+- `boots`
+- `smoke-tested`
+- `verified`
+- `broken`
+- `unverified`
+
+## Platform Features
+
+| Area | Feature | State | Notes |
+| --- | --- | --- | --- |
+| build | manifest structure | `in progress` | Repository boundaries exist; build handoff to installer remains to be implemented. |
+| build | rootfs bootstrap | `in progress` | Sprint 1 scripts and docs define the `mmdebstrap` path, but no successful artifact is claimed yet. |
+| build | package feed generation | `in progress` | Local package feed script exists for Atlantis-owned packages; no successful feed build is recorded yet. |
+| installer | host-side flashing flow | `planned` | Must include rollback-aware guardrails before routine device use. |
+| shell | initial shell integration | `in progress` | `atlantis-shell` is reserved as the Phosh integration boundary for Sprint 1. |
+| shell | launcher shell | `planned` | Atlantis-specific shell work is intentionally deferred beyond Sprint 1. |
+| shell | lock screen | `planned` | Architecture reserved only. |
+| shell | quick settings | `planned` | Architecture reserved only. |
+| shell | notifications | `planned` | Architecture reserved only. |
+| shell | settings app | `planned` | Stub package exists; UI work not started. |
+| shell | app switching | `planned` | No implementation yet. |
+| input | on-screen keyboard integration | `planned` | Not started. |
+| updates | update flow | `planned` | Constraints acknowledged early; implementation deferred. |
+| device | Pixel 8 bring-up package | `in progress` | Initial Debian package skeleton created in Sprint 0. |
+| QA | QEMU ARM64 (`virt`) smoke path | `in progress` | Concrete Sprint 1 execution document exists; no recorded boot result is claimed yet. |
+| QA | nested desktop Phosh smoke path | `in progress` | Concrete Sprint 1 execution document exists; no recorded session smoke result is claimed yet. |
+| QA | Pixel 8 hardware validation path | `planned` | Real hardware evidence has not been captured yet. |
+| branding | theme/token packaging | `in progress` | Branding package skeleton created; full assets deferred. |
+| QA | validation language and evidence policy | `verified` | Documentation baseline exists in Sprint 0 and was reviewed in-repo. |
+
+## Reading This Matrix
+
+- `in progress` means scaffolding or active engineering exists
+- `builds` in documentation or packaging context does not imply hardware verification
+- device features remain `unverified` until the device matrix records evidence
+PS>$global:?
+True
+**********************
+Ende der Windows PowerShell-Aufzeichnung
+Endzeit: 20260422073321
+**********************

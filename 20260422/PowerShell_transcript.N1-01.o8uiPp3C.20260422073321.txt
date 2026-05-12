@@ -1,0 +1,42 @@
+﻿**********************
+nStart der Windows PowerShell-Aufzeichnung
+Startzeit: 20260422073321
+Benutzername: CHS-VILLACH\moertl.mijo
+RunAs-Benutzer: CHS-VILLACH\moertl.mijo
+Konfigurationsname: 
+Computer: N1-01 (Microsoft Windows NT 10.0.26100.0)
+Hostanwendung: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command [Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('README.md')
+Prozess-ID: 6456
+PSVersion: 5.1.26100.7920
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7920
+BuildVersion: 10.0.26100.7920
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+PS>[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('README.md')
+# Atlantis
+
+Atlantis is a Debian-based mobile operating system aimed at mainstream smartphone users.
+
+This repository is the monorepo for Atlantis foundations, packaging, shell work, device enablement, installer tooling, CI, and long-term product documentation. Sprint 1 turns the project from structure into a real boot path definition: a scriptable `mmdebstrap` rootfs, a layered testing strategy, Phosh as the initial shell boundary, and a documented Pixel 8 boot path for the first genuine boot attempt.
+
+Current development focus:
+
+- Debian-based, reproducible OS composition
+- modular mobile UX stack on Wayland
+- first bring-up path for Google Pixel 8 (`shiba`)
+- strict separation between generic Atlantis components and device-specific enablement
+- truthful status tracking with no unsupported hardware claims
+
+See [docs/foundation-spec.md](docs/foundation-spec.md) for the product and architecture baseline, [docs/roadmap.md](docs/roadmap.md) for the staged execution plan, and [docs/testing.md](docs/testing.md) for the layered validation policy plus Sprint 1 smoke-path documents.
+PS>$global:?
+True
+**********************
+Ende der Windows PowerShell-Aufzeichnung
+Endzeit: 20260422073321
+**********************

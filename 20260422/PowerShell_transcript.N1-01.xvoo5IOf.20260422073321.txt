@@ -1,0 +1,39 @@
+﻿**********************
+nStart der Windows PowerShell-Aufzeichnung
+Startzeit: 20260422073321
+Benutzername: CHS-VILLACH\moertl.mijo
+RunAs-Benutzer: CHS-VILLACH\moertl.mijo
+Konfigurationsname: 
+Computer: N1-01 (Microsoft Windows NT 10.0.26100.0)
+Hostanwendung: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command [Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('manifest/README.md')
+Prozess-ID: 1180
+PSVersion: 5.1.26100.7920
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7920
+BuildVersion: 10.0.26100.7920
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+PS>[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;
+[System.IO.File]::ReadAllText('manifest/README.md')
+# manifest
+
+This directory owns build composition and reproducibility metadata.
+
+Planned contents include:
+
+- source pinning for Atlantis-owned packages and upstream repositories
+- image/profile definitions for development and release variants
+- package lists and composition manifests
+- reproducibility inputs such as version locks, checksums, and release manifests
+
+No device-specific quirks should live here unless they are referenced through explicit device profiles.
+PS>$global:?
+True
+**********************
+Ende der Windows PowerShell-Aufzeichnung
+Endzeit: 20260422073321
+**********************
