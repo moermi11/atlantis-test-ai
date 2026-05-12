@@ -16,18 +16,17 @@ jobs:
           mkdir -p out/reports
           chmod +x scripts/validate_contracts_phase1.sh
           bash scripts/validate_contracts_phase1.sh
-        continue-on-error: true  # Allows artifact upload even on expected failures
+        continue-on-error: true
+
+      - name: Print JSON Report Content
+        run: cat out/reports/phase1_validation.json
 
       - name: Upload JSON Report
         uses: actions/upload-artifact@v4
         with:
           name: phase1-validation-report
           path: out/reports/phase1_validation.json
-
-      - name: Print Summary
-        run: |
-          if [ -f out/reports/phase1_validation.json ]; then
-            echo "📄 Validation Report Content:"
-            cat out/reports/phase1_validation.json
-          fi
-          echo "⚠️ Job may show as 'failed'. This is expected during Dry-Run."
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
