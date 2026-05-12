@@ -1,0 +1,9 @@
+      - name: Upload JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-validation-report
+          path: out/reports/phase1_validation.json
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
