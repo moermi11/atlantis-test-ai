@@ -1,0 +1,13 @@
+Source: atlantis-branding
+Section: misc
+Priority: optional
+Maintainer: Atlantis Project <packages@atlantis.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: atlantis-branding
+Architecture: all
+Depends: ${misc:Depends}
+Description: Atlantis branding assets
+ Debian package boundary for Atlantis branding resources and theme defaults.

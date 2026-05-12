@@ -1,0 +1,16 @@
+Source: atlantis-base
+Section: metapackages
+Priority: optional
+Maintainer: Atlantis Project <packages@atlantis.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: atlantis-base
+Architecture: all
+Depends: ${misc:Depends}, atlantis-branding, atlantis-shell
+Description: Atlantis base metapackage
+ Debian metapackage for Atlantis core operating system defaults.
+ .
+ This package is intentionally device-agnostic. Device enablement belongs in
+ dedicated Atlantis device packages.

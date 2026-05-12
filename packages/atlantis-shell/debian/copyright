@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: atlantis-shell
+Source: internal
+
+Files: *
+Copyright: 2026 Atlantis Project
+License: TBD
+ Sprint 0 skeleton. Replace with project licensing details before release.

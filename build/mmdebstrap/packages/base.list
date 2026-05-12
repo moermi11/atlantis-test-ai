@@ -1,0 +1,7 @@
+# Minimal userspace needed before device-specific bring-up.
+ca-certificates
+dbus
+network-manager
+sudo
+systemd-sysv
+udev

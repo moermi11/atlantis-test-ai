@@ -1,0 +1,16 @@
+Source: atlantis-device-google-shiba
+Section: misc
+Priority: optional
+Maintainer: Atlantis Project <packages@atlantis.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: atlantis-device-google-shiba
+Architecture: arm64
+Depends: ${misc:Depends}
+Description: Atlantis device package for Google Pixel 8 (shiba)
+ Debian package boundary for Google Pixel 8 specific enablement, boot assets,
+ and documented firmware handling procedures.
+ .
+ This package must remain isolated from generic Atlantis packages.
